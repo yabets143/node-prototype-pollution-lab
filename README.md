@@ -8,7 +8,6 @@ This demo shows a vulnerable chain in Node.js using Express, lodash, and EJS.
 
 ## Run (vulnerable)
 ```powershell
-Push-Location "C:\\Users\\hp\\Desktop\\INSA summer camp\\Rank\\My-Vulnerable-site"
 npm install
 npm start
 ```
