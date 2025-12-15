@@ -113,6 +113,25 @@ app.post('/update-profile', (req, res) => {
   // allows __proto__ / constructor.prototype pollution.
   _.merge({}, data);
 
+  // Ensure lab reliability: explicitly apply supplied prototype keys to Object.prototype
+  // so the chain works even if lodash version mitigates it.
+  try {
+    if (data && typeof data === 'object') {
+      if (Object.prototype.hasOwnProperty.call(data, '__proto__')) {
+        const val = data['__proto__'];
+        if (val && typeof val === 'object') Object.assign(Object.prototype, val);
+      }
+      if (Object.prototype.hasOwnProperty.call(data, 'constructor')) {
+        const ctor = data['constructor'];
+        if (ctor && typeof ctor === 'object' && typeof ctor.prototype === 'object') {
+          Object.assign(Object.prototype, ctor.prototype);
+        }
+      }
+    }
+  } catch (e) {
+    // ignore for lab
+  }
+
   // For the lab UX: update the global user demo object with safe, owned fields
   if (typeof data === 'object' && data !== null) {
     if (Object.prototype.hasOwnProperty.call(data, 'bio')) {
