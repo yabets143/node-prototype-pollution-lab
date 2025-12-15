@@ -1,0 +1,18 @@
+{
+  "name": "my-vulnerable-site",
+  "version": "1.0.0",
+  "description": "Prototype Pollution -> EJS SSTI -> RCE demo",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^2.2.1",
+    "ejs": "^3.1.10",
+    "express": "^5.2.1",
+    "lodash": "^4.17.21",
+    "express-session": "^1.18.1",
+    "multer": "^1.4.5-lts.1"
+  }
+}

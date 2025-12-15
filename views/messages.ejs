@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Messages</title>
+  <style>
+    body { font-family: system-ui, sans-serif; margin: 2rem; }
+    .msg { padding: .5rem; border-bottom: 1px solid #ddd; }
+    .meta { color: #666; font-size: .9rem; }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="/">Home</a>
+    <a href="/dashboard">Dashboard</a>
+    <a href="/upload">Upload</a>
+    <a href="/admin">Admin</a>
+    <form action="/auth/logout" method="post" style="display:inline"><button>Logout</button></form>
+  </nav>
+
+  <h1>Messages</h1>
+  <form method="post" action="/messages" style="margin-bottom:1rem">
+    <input name="text" placeholder="Say something..." style="width: 300px" />
+    <button type="submit">Send</button>
+  </form>
+
+  <div>
+    <% messages.forEach(m => { %>
+      <div class="msg">
+        <div><strong><%= m.from %></strong>: <%= m.text %></div>
+        <div class="meta"><%= new Date(m.at).toLocaleString() %></div>
+      </div>
+    <% }) %>
+  </div>
+</body>
+</html>

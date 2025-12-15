@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Dashboard</title>
+  <style>
+    body { font-family: system-ui, sans-serif; margin: 2rem; }
+    nav a { margin-right: 1rem; }
+    form section { margin-bottom: 1rem; }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="/">Home</a>
+    <a href="/messages">Messages</a>
+    <a href="/upload">Upload</a>
+    <a href="/admin">Admin</a>
+    <form action="/auth/logout" method="post" style="display:inline"><button>Logout</button></form>
+  </nav>
+
+  <h1>Dashboard</h1>
+  <p>Signed in as <strong><%= profile.username %></strong></p>
+
+  <h2>Profile</h2>
+  <form method="post" action="/update-profile">
+    <section>
+      <label>Username</label><br />
+      <input name="username" value="<%= profile.username %>" />
+    </section>
+    <section>
+      <label>Bio</label><br />
+      <textarea name="bio" rows="4" cols="50"><%= profile.bio || '' %></textarea>
+    </section>
+    <button type="submit">Save</button>
+  </form>
+
+  <h2>Lab Demo Object</h2>
+  <p>This is the global object used by the vulnerable admin route.</p>
+  <pre><%= JSON.stringify(labUser, null, 2) %></pre>
+</body>
+</html>

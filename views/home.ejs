@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Parameter Pollution Lab - Home</title>
+  <style>
+    body { font-family: system-ui, sans-serif; margin: 2rem; }
+    nav a { margin-right: 1rem; }
+  </style>
+</head>
+<body>
+  <h1>Parameter Pollution Lab</h1>
+  <nav>
+    <% if (currentUser) { %>
+      <span>Signed in as <strong><%= currentUser.username %></strong></span>
+      <a href="/dashboard">Dashboard</a>
+      <a href="/messages">Messages</a>
+      <a href="/upload">Upload</a>
+      <form action="/auth/logout" method="post" style="display:inline">
+        <button type="submit">Logout</button>
+      </form>
+    <% } else { %>
+      <a href="/auth/login">Login</a>
+      <a href="/auth/register">Register</a>
+    <% } %>
+    <a href="/admin">Admin</a>
+  </nav>
+
+  <p>Use this app to explore prototype/parameter pollution effects with <code>lodash.merge</code> and EJS.</p>
+  <ul>
+    <li>Try <a href="/search?filters[q]=hello&filters[tags][]=x&filters[tags][]=y&page=2">/search</a> to see how query merging changes nested defaults.</li>
+    <li>Profile updates use <code>POST /update-profile</code>, which intentionally performs an unsafe merge.</li>
+  </ul>
+</body>
+</html>

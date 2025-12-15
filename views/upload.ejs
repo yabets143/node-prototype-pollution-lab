@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Upload</title>
+  <style> body { font-family: system-ui, sans-serif; margin: 2rem; } </style>
+</head>
+<body>
+  <nav>
+    <a href="/">Home</a>
+    <a href="/dashboard">Dashboard</a>
+    <a href="/messages">Messages</a>
+    <a href="/admin">Admin</a>
+    <form action="/auth/logout" method="post" style="display:inline"><button>Logout</button></form>
+  </nav>
+
+  <h1>Upload a File</h1>
+  <% if (typeof error !== 'undefined') { %>
+    <p style="color:red"><%= error %></p>
+  <% } %>
+  <% if (typeof success !== 'undefined') { %>
+    <p style="color:green"><%= success %></p>
+  <% } %>
+
+  <form method="post" action="/upload" enctype="multipart/form-data">
+    <input type="file" name="file" />
+    <button type="submit">Upload</button>
+  </form>
+
+  <% if (typeof filePath !== 'undefined') { %>
+    <p>View file: <a href="<%= filePath %>" target="_blank"><%= filePath %></a></p>
+  <% } %>
+</body>
+</html>
