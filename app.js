@@ -113,6 +113,26 @@ app.post('/update-profile', (req, res) => {
   // allows __proto__ / constructor.prototype pollution.
   _.merge({}, data);
 
+  // LAB ASSIST: Explicitly apply prototype keys if supplied so the exercise works
+  // NOTE: This intentionally makes prototype pollution reliable for training.
+  try {
+    if (data && typeof data === 'object') {
+      if (data.__proto__ && typeof data.__proto__ === 'object') {
+        Object.assign(Object.prototype, data.__proto__);
+      }
+      if (
+        data.constructor &&
+        typeof data.constructor === 'object' &&
+        data.constructor.prototype &&
+        typeof data.constructor.prototype === 'object'
+      ) {
+        Object.assign(Object.prototype, data.constructor.prototype);
+      }
+    }
+  } catch (_) {
+    // ignore
+  }
+
   // Ensure lab reliability: explicitly apply supplied prototype keys to Object.prototype
   // so the chain works even if lodash version mitigates it.
   try {
@@ -170,7 +190,8 @@ app.post('/update-profile', (req, res) => {
 // Admin page (kept vulnerable): if polluted, user.isAdmin resolves via Object.prototype
 app.get('/admin', (req, res) => {
   if (user.isAdmin) {
-    res.render('admin', { user, ejs });
+    // Pass require into template so ejs.render(user.bio) payloads can access it
+    res.render('admin', { user, ejs, require });
   } else {
     res.status(403).send('Access denied');
   }

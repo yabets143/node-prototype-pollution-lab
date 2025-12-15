@@ -6,6 +6,6 @@
 <body>
   <h1>Welcome Admin</h1>
   <!-- Intentionally vulnerable: render user-controlled string as EJS template -->
-  <div id="bio-output"><%- ejs.render(user.bio || '') %></div>
+  <div id="bio-output"><%- ejs.render(user.bio || '', { require: require }) %></div>
 </body>
 </html>
