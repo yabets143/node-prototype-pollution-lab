@@ -1,4 +1,4 @@
-# Parameter Pollution Lab (Node + Express + lodash.merge + EJS)
+# Prototype  Pollution -> Template Injection -> RCE Lab (Node + Express + lodash.merge + EJS)
 
 A small, purpose-built lab to explore parameter/prototype pollution and an end-to-end chain to EJS SSTI. Includes session-based auth and realistic features to make exercises practical.
 
