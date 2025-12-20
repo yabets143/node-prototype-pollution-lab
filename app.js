@@ -1,7 +1,3 @@
-// app.js
-// Node + Express + lodash.merge + EJS demo app for parameter pollution labs
-// Includes: auth/session handling, profile update, messaging, file upload
-
 const express = require('express');
 const bodyParser = require('body-parser');
 const session = require('express-session');
@@ -16,10 +12,12 @@ const app = express();
 app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Static files (serve uploads)
+
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// Sessions (in-memory for demo purposes only)
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Sessions (in-memory for demo purposes )
 app.use(
   session({
     secret: 'lab-secret',
@@ -33,17 +31,16 @@ app.use(
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
-// In-memory stores (DO NOT use in production)
-const users = new Map(); // username -> { username, password, bio }
-const messages = []; // { from, text, at }
 
-// Global user object to support the original lab chain (admin bypass via pollution)
+const users = new Map();
+const messages = [];
+
 let user = { username: 'guest', bio: '' };
 
 // Multer upload destination
 const upload = multer({ dest: path.join(__dirname, 'uploads') });
 
-// Expose current user to templates
+
 app.use((req, res, next) => {
   res.locals.currentUser = req.session.user || null;
   next();
@@ -71,7 +68,6 @@ app.post('/auth/register', (req, res) => {
   res.redirect('/auth/login');
 });
 
-// Auth: Login
 app.get('/auth/login', (req, res) => {
   res.render('login');
 });
@@ -86,73 +82,28 @@ app.post('/auth/login', (req, res) => {
   res.redirect('/dashboard');
 });
 
-// Auth: Logout
+
 app.post('/auth/logout', (req, res) => {
   req.session.destroy(() => {
     res.redirect('/');
   });
 });
 
-// Require login middleware
+
 function requireLogin(req, res, next) {
   if (!req.session.user) return res.redirect('/auth/login');
   next();
 }
 
-// Dashboard (profile page)
 app.get('/dashboard', requireLogin, (req, res) => {
   const u = users.get(req.session.user.username);
   res.render('dashboard', { profile: u, labUser: user });
 });
 
-// Vulnerable endpoint (kept for lab): prototype pollution via lodash.merge into a fresh object
-// Accepts JSON body. The dashboard form can also target this route (urlencoded) for demo purposes.
 app.post('/update-profile', (req, res) => {
   const data = req.body;
-  // VULNERABILITY: Using lodash.merge with attacker-controlled input on a fresh object
-  // allows __proto__ / constructor.prototype pollution.
-  _.merge({}, data);
+  _.merge({} , data);
 
-  // LAB ASSIST: Explicitly apply prototype keys if supplied so the exercise works
-  // NOTE: This intentionally makes prototype pollution reliable for training.
-  try {
-    if (data && typeof data === 'object') {
-      if (data.__proto__ && typeof data.__proto__ === 'object') {
-        Object.assign(Object.prototype, data.__proto__);
-      }
-      if (
-        data.constructor &&
-        typeof data.constructor === 'object' &&
-        data.constructor.prototype &&
-        typeof data.constructor.prototype === 'object'
-      ) {
-        Object.assign(Object.prototype, data.constructor.prototype);
-      }
-    }
-  } catch (_) {
-    // ignore
-  }
-
-  // Ensure lab reliability: explicitly apply supplied prototype keys to Object.prototype
-  // so the chain works even if lodash version mitigates it.
-  try {
-    if (data && typeof data === 'object') {
-      if (Object.prototype.hasOwnProperty.call(data, '__proto__')) {
-        const val = data['__proto__'];
-        if (val && typeof val === 'object') Object.assign(Object.prototype, val);
-      }
-      if (Object.prototype.hasOwnProperty.call(data, 'constructor')) {
-        const ctor = data['constructor'];
-        if (ctor && typeof ctor === 'object' && typeof ctor.prototype === 'object') {
-          Object.assign(Object.prototype, ctor.prototype);
-        }
-      }
-    }
-  } catch (e) {
-    // ignore for lab
-  }
-
-  // For the lab UX: update the global user demo object with safe, owned fields
   if (typeof data === 'object' && data !== null) {
     if (Object.prototype.hasOwnProperty.call(data, 'bio')) {
       user.bio = data.bio;
@@ -162,7 +113,7 @@ app.post('/update-profile', (req, res) => {
     }
   }
 
-  // Also update the logged-in user's profile, if any (no pollution here; simple assignment)
+  // Also update the logged-in user's profile, if any 
   if (req.session.user && typeof data === 'object' && data !== null) {
     const u = users.get(req.session.user.username);
     if (u) {
@@ -187,17 +138,18 @@ app.post('/update-profile', (req, res) => {
   return res.redirect('/dashboard');
 });
 
-// Admin page (kept vulnerable): if polluted, user.isAdmin resolves via Object.prototype
+
 app.get('/admin', (req, res) => {
   if (user.isAdmin) {
     // Pass require into template so ejs.render(user.bio) payloads can access it
     res.render('admin', { user, ejs, require });
   } else {
-    res.status(403).send('Access denied');
+    res.status(403);
+    res.render('403', { title: 'Access Denied' });
   }
 });
 
-// Messages (simple in-memory guestbook)
+// Messages
 app.get('/messages', requireLogin, (req, res) => {
   const list = messages.slice(-50);
   res.render('messages', { messages: list });
@@ -211,7 +163,7 @@ app.post('/messages', requireLogin, (req, res) => {
   res.redirect('/messages');
 });
 
-// File upload
+
 app.get('/upload', requireLogin, (req, res) => {
   res.render('upload');
 });
@@ -220,6 +172,8 @@ app.post('/upload', requireLogin, upload.single('file'), (req, res) => {
   if (!req.file) return res.status(400).render('upload', { error: 'No file uploaded' });
   res.render('upload', { success: `Uploaded ${req.file.originalname}`, filePath: `/uploads/${req.file.filename}` });
 });
+
+
 
 // Simple defaults merge route (for illustrating parameter pollution via query merge)
 // Not privileged, but demonstrates how merging untrusted query can alter nested defaults.
@@ -230,7 +184,7 @@ app.get('/search', (req, res) => {
   res.json({ effective });
 });
 
-// Start server
+
 app.listen(3000, () => {
   console.log('Lab app running on http://localhost:3000');
 });

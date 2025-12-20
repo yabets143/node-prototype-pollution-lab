@@ -1,41 +1,34 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8" />
-  <title>Dashboard</title>
-  <style>
-    body { font-family: system-ui, sans-serif; margin: 2rem; }
-    nav a { margin-right: 1rem; }
-    form section { margin-bottom: 1rem; }
-  </style>
-</head>
-<body>
-  <nav>
-    <a href="/">Home</a>
-    <a href="/messages">Messages</a>
-    <a href="/upload">Upload</a>
-    <a href="/admin">Admin</a>
-    <form action="/auth/logout" method="post" style="display:inline"><button>Logout</button></form>
-  </nav>
+<%- include('partials/header', { title: 'Dashboard • Parameter Pollution Lab' }) %>
 
-  <h1>Dashboard</h1>
-  <p>Signed in as <strong><%= profile.username %></strong></p>
+<div class="row g-4">
+  <div class="col-12 col-lg-7">
+    <div class="card">
+      <div class="card-header"><strong>Profile</strong></div>
+      <div class="card-body">
+        <p class="mb-3">Signed in as <strong><%= profile.username %></strong></p>
+        <form method="post" action="/update-profile" class="d-grid gap-3">
+          <div>
+            <label class="form-label">Username</label>
+            <input class="form-control" name="username" value="<%= profile.username %>" />
+          </div>
+          <div>
+            <label class="form-label">Bio</label>
+            <textarea class="form-control" name="bio" rows="4"><%= profile.bio || '' %></textarea>
+          </div>
+          <button class="btn btn-primary" type="submit">Save</button>
+        </form>
+      </div>
+    </div>
+  </div>
+  <div class="col-12 col-lg-5">
+    <div class="card">
+      <div class="card-header"><strong>Lab Demo Object</strong></div>
+      <div class="card-body">
+        <p class="text-secondary">Global object used by the vulnerable admin route.</p>
+        <pre><%= JSON.stringify(labUser, null, 2) %></pre>
+      </div>
+    </div>
+  </div>
+</div>
 
-  <h2>Profile</h2>
-  <form method="post" action="/update-profile">
-    <section>
-      <label>Username</label><br />
-      <input name="username" value="<%= profile.username %>" />
-    </section>
-    <section>
-      <label>Bio</label><br />
-      <textarea name="bio" rows="4" cols="50"><%= profile.bio || '' %></textarea>
-    </section>
-    <button type="submit">Save</button>
-  </form>
-
-  <h2>Lab Demo Object</h2>
-  <p>This is the global object used by the vulnerable admin route.</p>
-  <pre><%= JSON.stringify(labUser, null, 2) %></pre>
-</body>
-</html>
+<%- include('partials/footer') %>

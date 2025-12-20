@@ -1,0 +1,21 @@
+<%- include('partials/header', { title: typeof title !== 'undefined' ? title : 'Access Denied' }) %>
+
+<div class="row justify-content-center mt-4">
+  <div class="col-12 col-md-8 col-lg-6">
+    <div class="card text-center">
+      <div class="card-body py-5">
+        <div class="display-5 mb-3">🚫</div>
+        <h1 class="h3 mb-2">Access Denied</h1>
+        <p class="text-secondary mb-4">You don't have permission to view this page.</p>
+        <div class="d-flex justify-content-center gap-2">
+          <a href="/" class="btn btn-primary">Go Home</a>
+          <a href="/auth/login" class="btn btn-outline-light">Login</a>
+          <a href="/dashboard" class="btn btn-outline-light">Dashboard</a>
+        </div>
+      </div>
+      <div class="card-footer text-secondary small">HTTP 403</div>
+    </div>
+  </div>
+</div>
+
+<%- include('partials/footer') %>

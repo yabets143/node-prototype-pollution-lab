@@ -1,6 +1,3 @@
-// app.patched.js
-// Patched demo app: mitigations for prototype pollution and template injection
-
 const express = require('express');
 const bodyParser = require('body-parser');
 const _ = require('lodash');

