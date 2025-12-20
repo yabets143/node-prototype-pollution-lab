@@ -175,8 +175,6 @@ app.post('/upload', requireLogin, upload.single('file'), (req, res) => {
 
 
 
-// Simple defaults merge route (for illustrating parameter pollution via query merge)
-// Not privileged, but demonstrates how merging untrusted query can alter nested defaults.
 app.get('/search', (req, res) => {
   const defaults = { page: 1, pageSize: 10, filters: { q: '', tags: [] } };
   // Using lodash.merge on query parameters can lead to unexpected structure changes

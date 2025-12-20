@@ -1,6 +1,6 @@
 # Prototype  Pollution -> Template Injection -> RCE Lab (Node + Express + lodash.merge + EJS)
 
-A small, purpose-built lab to explore parameter/prototype pollution and an end-to-end chain to EJS SSTI. Includes session-based auth and realistic features to make exercises practical.
+A small, purpose-built lab to explore prototype pollution and an end-to-end chain to EJS SSTI. Includes session-based auth and realistic features to make exercises practical.
 
 ## Stack
 - Node.js, Express 5, EJS
@@ -41,7 +41,7 @@ This reproduces the classic chain using the intentionally vulnerable routes.
 
 Automatic exploit:
 ```powershell
-sh exploit_admin_bypass.sh
+python3 exploit_chain.py 
 ```
 
 Manual steps with curl :
@@ -62,16 +62,7 @@ curl -s http://localhost:3000/admin
 
 If the chain succeeds, `/admin` renders the command output inside the page.
 
-### 2) Parameter Pollution in Nested Query Defaults
-`GET /search` merges query into nested defaults using `lodash.merge`.
-
-Example:
-```powershell
-curl "http://localhost:3000/search?filters[q]=hello&filters[tags][]=x&filters[tags][]=y&page=5"
-```
-Response shows how untrusted query can restructure nested `filters`.
-
-### 3) Realistic Features for Practice
+### 2) Realistic Features for Practice
 - Profile update via Dashboard posts to `POST /update-profile` (same vulnerable code path for the lab).
 - Messages at `/messages` store the last messages in-memory.
 - Upload at `/upload` saves files to `/uploads` and serves them statically.
