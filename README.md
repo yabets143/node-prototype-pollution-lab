@@ -97,6 +97,8 @@ Step 3: Trigger vulnerable admin render
 
 GET /admin HTTP/1.1Host: localhost:3000
 Impact: Prototype pollution grants access; EJS evaluates bio with require in scope, executing the command and printing its output in the HTML.
+
+
 ## Patched Variant
 - Run the patched server:
 ```powershell
@@ -105,3 +107,6 @@ node .\app.patched.js
 - Changes in patch: sanitizes dangerous keys, requires own `user.isAdmin`, and uses a safe template `views/admin_patched.ejs`.
 - Re-running the exploit should fail to gain admin and will not execute the EJS payload.
 
+
+
+Vulnerability Documentation : https://docs.google.com/document/d/1ext93w0tUzoOLUXIpqw-bCW27dMKswwrbfbAS3mUm2Q/edit?usp=sharing
